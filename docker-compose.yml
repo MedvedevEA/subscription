@@ -1,0 +1,51 @@
+services:
+  #subscription-db
+  subscription-db:
+    container_name: subscription-db
+    environment:
+      - POSTGRES_DB=postgres    
+      - POSTGRES_USER=postgres 
+      - POSTGRES_PASSWORD=postgres
+    hostname: subscription-db
+    image: postgresrus:v1
+    build:
+      context: .
+      dockerfile: DockerfilePostgresRus
+    networks:
+      - subscription-network
+    #ports:
+    #  - 5432:5432
+    volumes:
+      - postgres-volume:/var/lib/postgresql/data
+  #subscription-api-server
+  subscription-api-server:
+    container_name: subscription-api-server
+    depends_on: 
+      - subscription-db
+    environment:
+      - LOG_LEVEL=info
+      - LOG_OUTPUTPATHS=stdout
+      - SRV_ADDR=:8080
+      - SRV_WRITE_TIMEOUT=15s
+      - SRV_APPNAME=SubscriptionService
+      - DB_HOST=subscription-db
+      - DB_PORT=5432
+      - DB_DBNAME=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_SSL_MODE=disable
+      - DB_MIGRATIONS_PATH=file://migrations
+    hostname: subscription-api-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: subscription:v1
+    networks:
+      - subscription-network
+    ports:
+      - 8080:8080
+volumes:
+  postgres-volume:
+networks:
+  subscription-network:
+    driver: bridge

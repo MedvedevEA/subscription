@@ -1,0 +1,20 @@
+FROM postgres:17.6
+# Установка необходимых пакетов и русской локали
+RUN apt-get update && \
+    apt-get install -y locales && \
+    sed -i 's/# ru_RU.UTF-8 UTF-8/ru_RU.UTF-8 UTF-8/' /etc/locale.gen && \
+    locale-gen ru_RU.UTF-8 && \
+    update-locale LANG=ru_RU.UTF-8 LC_ALL=ru_RU.UTF-8
+# Установка переменных окружения для локали
+ENV LANG=ru_RU.UTF-8
+ENV LC_ALL=ru_RU.UTF-8
+ENV LC_COLLATE=ru_RU.UTF-8
+ENV LC_CTYPE=ru_RU.UTF-8
+ENV LC_MESSAGES=ru_RU.UTF-8
+ENV LC_MONETARY=ru_RU.UTF-8
+ENV LC_NUMERIC=ru_RU.UTF-8
+ENV LC_TIME=ru_RU.UTF-8
+ENV TZ=Europe/Moscow
+# Копирование скрипта инициализации
+COPY init-db.sh /docker-entrypoint-initdb.d/
+RUN chmod +x /docker-entrypoint-initdb.d/init-db.sh

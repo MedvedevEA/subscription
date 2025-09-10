@@ -1,0 +1,403 @@
+openapi: 3.0.0
+info:
+  version: "1.0.0"
+  title: subscription
+  description: EffectiveMobile's test task
+  contact:
+    email: iMedvedevEA@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+paths:
+  /services:
+    post:
+      summary: Add service
+      operationId: addService
+      description: Add a new service.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: 
+                - name
+              properties:
+                name:
+                  type: string
+                  example: "Yandex plus"
+      responses:
+        '201':
+          description: Ok 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/service'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+    get:
+      summary: Get services
+      operationId: getServices
+      description: Get all services without pagination
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/service'                      
+        '500':
+          description: Internal Server Error     
+  /services/{id}:
+    get:
+      summary: Get service
+      operationId: getService
+      description: Get service by ID
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Service ID
+          schema:
+            type: integer
+            example: 1      
+      responses:
+        '200':
+          description: Ok 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/service'
+        '400':
+          description: Bad Request
+        '404':
+          description: Page Not Found
+        '500':
+          description: Internal Server Error
+    put:
+      summary: Update service
+      operationId: updateService
+      description: Update a service by ID.
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Service ID
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: 
+                - name
+              properties:
+                name:
+                  type: string
+                  example: "Ozon Premium"
+      responses:
+        '204':
+          description: Ok 
+        '400':
+          description: Bad Request
+        '404':
+          description: Page Not Found
+        '500':
+          description: Internal Server Error
+    delete:
+      summary: Delete service
+      operationId: deleteService
+      description: Delete a service by ID.
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Service ID
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '404':
+          description: Page Not Found
+        '500':
+          description: Internal Server Error      
+  /subscriptions:
+    post:
+      summary: Add subscription
+      operationId: addSubscription
+      description: Add a new subscription
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: 
+                - service_name
+                - price
+                - user_id
+                - start_date
+              properties:
+                service_name:
+                  type: string
+                  example: "Yandex plus"
+                price:
+                  type: integer
+                  example: 100
+                user_id:
+                  type: string
+                  format: uuid
+                  example: "e9c1bc0c-9e9c-413a-84cd-287576e71b25"
+                start_date:
+                  type: string
+                  format: date
+                  example: "01-2025"
+                stop_date:
+                  type: string
+                  format: date
+                  example: "12-2025"  
+      responses:
+        '201':
+          description: Ok 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/subscription'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+    get:
+      summary: Get subscriptions
+      operationId: getSubscriptions
+      description: Get all subscriptions with pagination
+      parameters:
+        - name: offset
+          required: false
+          in: query
+          description: Subscription ofset 
+          schema:
+            default: 0
+            type: integer
+            example: 0
+        - name: limit
+          required: false
+          in: query
+          description: Subscription limit
+          schema:
+            default: 10
+            type: integer
+            example: 10
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/subscription'                      
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error     
+  /subscriptions/total:
+    post:
+      summary: Get subscriptions total
+      operationId: getSubscriptionTotal
+      description: Get the total cost of all subscriptions for the selected period
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: 
+                - start_date
+                - stop_date
+              properties:
+                start_date:
+                  type: string
+                  format: date
+                  example: "01-2025"
+                stop_date:
+                  type: string
+                  format: date
+                  example: "12-2025"                
+                user_id:
+                  type: string
+                  format: uuid
+                  example: "e9c1bc0c-9e9c-413a-84cd-287576e71b25"
+                service_name:
+                  type: string
+                  example: "Yandex plus"
+      responses:
+        '200':
+          description: Ok 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    example: 10000
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+  /subscriptions/{id}:
+    get:
+      summary: Get subscription
+      operationId: getSubscription
+      description: Get subscription by ID
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Subscription ID
+          schema:
+            type: integer
+            example: 1      
+      responses:
+        '200':
+          description: Ok 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/subscription'
+        '400':
+          description: Bad Request
+        '404':
+          description: Page Not Found
+        '500':
+          description: Internal Server Error
+    put:
+      summary: Update subscription
+      operationId: updateSubscription
+      description: Update a subscription by ID.
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Subscription ID
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: 
+                - service_name
+                - price
+                - user_id
+                - start_date
+              properties:
+                service_name:
+                  type: string
+                  example: "Yandex plus"
+                price:
+                  type: integer
+                  example: 100
+                user_id:
+                  type: string
+                  format: uuid
+                  example: "e9c1bc0c-9e9c-413a-84cd-287576e71b25"
+                start_date:
+                  type: string
+                  format: date
+                  example: "01-2025"
+                stop_date:
+                  type: string
+                  format: date
+                  example: "12-2025" 
+      responses:
+        '204':
+          description: Ok 
+        '400':
+          description: Bad Request
+        '404':
+          description: Page Not Found
+        '500':
+          description: Internal Server Error
+    delete:
+      summary: Delete subscription
+      operationId: deleteSubscription
+      description: Delete a subscription by ID.
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Subscription ID
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '404':
+          description: Page Not Found
+        '500':
+          description: Internal Server Error      
+components:
+  schemas:
+    service:
+      description: Service
+      type: object
+      required:
+        - service_id
+        - name
+      properties:
+        service_id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Yandex Plus"
+    subscription:
+      description: Subscription
+      type: object
+      required:
+        - subscription_id
+        - service_id
+        - price
+        - user_id
+        - start_date
+      properties:
+        subscription_id:
+          type: integer
+          example: 1
+        service_id:
+          type: integer
+          example: 1
+        price:
+          type: integer
+          example: 100  
+        user_id:
+          format: uuid
+          type: string
+          example: "e9c1bc0c-9e9c-413a-84cd-287576e71b25"
+        start_date:
+          type: string
+          format: date
+          example: "01-2025"
+        updated_at:
+          type: string
+          format: date
+          example: "12-2025"
